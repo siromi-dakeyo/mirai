@@ -19,6 +19,7 @@
         <a href="#zero">ゼロから</a>
         <a href="#share">共有</a>
         <a href="#care">留意点</a>
+        <a href="#feedback">ご意見</a>
       </nav>
     </div>
   </header>
@@ -223,12 +224,53 @@
 
   </main>
 
+  <section class="section feedback" id="feedback">
+    <div class="inner narrow">
+      <h2>ご意見番<small>あなたの声を聞かせてください</small></h2>
+      <form class="feedback-form" id="feedback-form" novalidate>
+        <div class="field">
+          <label for="fb-name">お名前</label>
+          <input type="text" id="fb-name" name="name" autocomplete="name" placeholder="例：山田 太郎（ニックネーム可）" required>
+        </div>
+        <div class="field">
+          <label for="fb-message">ご意見</label>
+          <textarea id="fb-message" name="message" rows="5" placeholder="このページへのご意見・ご感想をご記入ください" required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">送信する</button>
+        <p class="form-status" id="fb-status" role="status" aria-live="polite"></p>
+      </form>
+      <p class="form-note">※ 現在はモックです。入力内容はどこにも送信・保存されません。</p>
+    </div>
+  </section>
+
   <footer class="site-footer">
     <div class="inner">
       <p>※ このページは個人の意見・期待をまとめたもので、チームみらいの公式サイトではありません。</p>
       <p><a href="#" class="to-top">▲ ページの先頭へ</a></p>
     </div>
   </footer>
+
+  <script>
+    // ご意見番フォーム（モック：送信せず、画面上のメッセージのみ表示）
+    (function () {
+      var form = document.getElementById('feedback-form');
+      var status = document.getElementById('fb-status');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var name = form.elements.name.value.trim();
+        var message = form.elements.message.value.trim();
+        status.className = 'form-status';
+        if (!name || !message) {
+          status.classList.add('error');
+          status.textContent = 'お名前とご意見の両方をご入力ください。';
+          return;
+        }
+        status.classList.add('ok');
+        status.textContent = name + ' さん、ご意見ありがとうございました！（モックのため送信はされていません）';
+        form.reset();
+      });
+    })();
+  </script>
 
 </body>
 </html>
