@@ -239,7 +239,7 @@
         <button type="submit" class="btn-submit">送信する</button>
         <p class="form-status" id="fb-status" role="status" aria-live="polite"></p>
       </form>
-      <p class="form-note">※ 現在はモックです。入力内容はどこにも送信・保存されません。</p>
+      <p class="form-note">※ いただいたご意見はSupabase上のデータベースに保存されます。</p>
     </div>
   </section>
 
@@ -250,23 +250,48 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script>
-    // ご意見番フォーム（モック：送信せず、画面上のメッセージのみ表示）
+    // ご意見番フォーム（Supabaseの feedback テーブルにINSERT）
     (function () {
+      var SUPABASE_URL = 'https://tozecfdxuejcgokdskxf.supabase.co';
+      var SUPABASE_ANON_KEY = 'sb_publishable_Qdj8Mp0ASj_m0OrkTPZ8OQ_Dy_eNdEg';
+      var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
       var form = document.getElementById('feedback-form');
       var status = document.getElementById('fb-status');
-      form.addEventListener('submit', function (e) {
+      var submitBtn = form.querySelector('.btn-submit');
+
+      form.addEventListener('submit', async function (e) {
         e.preventDefault();
         var name = form.elements.name.value.trim();
         var message = form.elements.message.value.trim();
         status.className = 'form-status';
+
         if (!name || !message) {
           status.classList.add('error');
           status.textContent = 'お名前とご意見の両方をご入力ください。';
           return;
         }
-        status.classList.add('ok');
-        status.textContent = name + ' さん、ご意見ありがとうございました！（モックのため送信はされていません）';
+
+        submitBtn.disabled = true;
+        status.textContent = '送信中…';
+
+        var result = await supabaseClient
+          .from('feedback')
+          .insert({ name: name, message: message });
+
+        submitBtn.disabled = false;
+
+        if (result.error) {
+          console.error(result.error);
+          status.className = 'form-status error';
+          status.textContent = '送信に失敗しました。時間をおいて再度お試しください。';
+          return;
+        }
+
+        status.className = 'form-status ok';
+        status.textContent = name + ' さん、ご意見ありがとうございました！';
         form.reset();
       });
     })();
